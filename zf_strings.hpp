@@ -37,7 +37,10 @@ namespace zf_strings
      * each string in the return list have a maximum characters of "maxChar"
      */
     std::vector<std::string> splitString(const std::string& str, int maxChar);
-
+    
+    /**
+     * Check if longString starts with startString.
+     */
     bool startsWith(const std::string& longString, const std::string& startString);
 }
 #endif
