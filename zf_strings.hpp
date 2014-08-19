@@ -25,18 +25,18 @@
 #define _ZFRAMEWORK_ZF_STRINGS_HPP_
 #include <string>
 #include <vector>
-namespace zf_strings
+namespace zf
 {
     /**
      * Split a strings by a delimiter
      */
-    std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems);
-    std::vector<std::string> split(const std::string &s, char delim);
+    std::vector<std::string>& splitStringByDelimiter(const std::string &s, char delim, std::vector<std::string> &elems);
+    std::vector<std::string> splitStringByDelimiter(const std::string &s, char delim);
     /**
      * Split a single strings into multiple strings, 
      * each string in the return list have a maximum characters of "maxChar"
      */
-    std::vector<std::string> splitString(const std::string& str, int maxChar);
+    std::vector<std::string> splitStringByLength(const std::string& str, int maxChar);
     
     /**
      * Check if longString starts with startString.

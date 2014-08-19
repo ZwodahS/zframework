@@ -22,13 +22,13 @@
  */
 #include "zf_strings.hpp"
 #include <sstream>
-namespace zf_strings
+namespace zf
 {
     /**
      * These 2 functions are taken from
      * http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
      */
-    std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems) 
+    std::vector<std::string>& splitStringByDelimiter(const std::string &s, char delim, std::vector<std::string> &elems) 
     {
         std::stringstream ss(s);
         std::string item;
@@ -40,20 +40,20 @@ namespace zf_strings
     }
 
 
-    std::vector<std::string> split(const std::string &s, char delim) 
+    std::vector<std::string> splitStringByDelimiter(const std::string &s, char delim) 
     {
         std::vector<std::string> elems;
-        split(s, delim, elems);
+        splitStringByDelimiter(s, delim, elems);
         return elems;
     }
     /**
      * Split a single strings into multiple strings, 
      * each string in the return list have a maximum characters of "maxChar"
      */
-    std::vector<std::string> splitString(const std::string& str, int maxChar)
+    std::vector<std::string> splitStringByLength(const std::string& str, int maxChar)
     {
         std::vector<std::string> strings;
-        std::vector<std::string> tokens = split(str, ' ');
+        std::vector<std::string> tokens = splitStringByDelimiter(str, ' ');
         std::string curr = "";
         int token = 0 ;
         for (std::vector<std::string>::iterator it = tokens.begin() ; it != tokens.end() ; ++it)

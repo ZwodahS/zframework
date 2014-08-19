@@ -22,9 +22,10 @@
  */
 #ifndef _ZFRAMEWORK_ZF_CONVERSION_HPP_
 #define _ZFRAMEWORK_ZF_CONVERSION_HPP_
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-namespace zf_conversion
+namespace zf
 {
     //////////////////// Primitives ////////////////////
     /**
@@ -50,6 +51,8 @@ namespace zf_conversion
     std::string boolToString(bool value);
     
     std::string floatToString(float value, unsigned int numDecimal);
+
+    std::string rectToString(const sf::IntRect& rect);
 }
 
 #endif

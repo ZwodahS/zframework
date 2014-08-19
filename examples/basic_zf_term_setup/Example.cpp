@@ -23,8 +23,8 @@ void Example::init(const std::string& title, const sf::Vector2i& termSize, const
     window = new sf::RenderWindow(sf::VideoMode(screenSize.x, screenSize.y), title);
     window->setFramerateLimit(60);
     screen = new zf::TermScreen(*window, termSize);
-    screen->init(cellSize, sf::Vector2i(32, 32));
-    screen->autoLoad("data/font_32");
+    screen->init(cellSize);
+    
 }
 
 void Example::run()
@@ -35,16 +35,25 @@ void Example::run()
     /**
      * Create a terminal window that occupies the entire screen.
      */
-    zf::TermWindow& board = *screen->newWindow(sf::IntRect(10, 10, termSize.x - 15, termSize.y - 15));
-    
-    
-    int frame = 0;
-    float timePassed = 0;
+    zf::TermWindow& board = screen->newWindow(sf::IntRect(0, 0, termSize.x, termSize.y));
+
+    /**
+     * Loading of assets
+     */
+    sf::Texture texture;
+    if (!texture.loadFromFile("data/fill.png"))
+    {
+        std::cout << "Fail to load image" << std::endl;
+        return ;
+    }
+    sf::Sprite blackSprite(texture, sf::IntRect(0,0,cellSize.x,cellSize.y));
+    blackSprite.setColor(sf::Color::Black);
+    sf::Sprite whiteSprite(texture, sf::IntRect(0,0,cellSize.x,cellSize.y));
+    whiteSprite.setColor(sf::Color::White);
+
     while (!quit && window->isOpen())
     {
         sf::Time delta = clock.restart();
-        frame++;
-        timePassed += delta.asSeconds();
         
         sf::Event event;
         while (window->pollEvent(event))
@@ -55,35 +64,6 @@ void Example::run()
                 quit = true;
             }
         }
-        int row = 1, col = 1;
-        board.putString_xy(1, 1, std::string(1, char(32)));
-        for (int i = 33; i < 127; i++)
-        {
-            board.putString_xy(col, row, std::string(1, char(i)));
-            col++;
-            if (col == board.getBound().width - 1)
-            {
-                col = 1;
-                row++;
-            }
-        }
-
-        for (int i = 0; i < zf::TotalSpecialChar; i++)
-        {
-            board.putSprite_xyb(col, row, screen->getSpecialChar(i).createSprite());
-            col++;
-            if (col == board.getBound().width - 1)
-            {
-                col = 1;
-                row++;
-            }
-        }
-        board.drawCenterBorder();
-
-        row++;
-        board.putString_xy(1, ++row, std::to_string(timePassed));
-        board.putString_xy(1, ++row, std::to_string(frame / timePassed));
-        board.putString_xy(1, ++row, std::to_string(1 / delta.asSeconds()));
 
         if (!quit)
         {

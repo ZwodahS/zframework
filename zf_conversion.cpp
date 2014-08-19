@@ -22,7 +22,7 @@
  */
 #include "zf_conversion.hpp"
 #include <sstream>
-namespace conversion
+namespace zf
 {
     /**
      * This method originate from another file
@@ -73,7 +73,7 @@ namespace conversion
      */
     std::string floatToString(float value, unsigned int numDecimal)
     {
-        int max = 100;
+        int max = 1;
         for(int i = 0; i < numDecimal; i++)
         {
             max *= 10;
@@ -85,5 +85,10 @@ namespace conversion
             out.insert(out.size() - numDecimal, ".");
         }
         return out;
+    }
+
+    std::string rectToString(const sf::IntRect& rect)
+    {
+        return intToString(rect.left) + " " + intToString(rect.top) + " " + intToString(rect.width) + " " + intToString(rect.height);
     }
 }

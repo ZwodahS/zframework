@@ -12,8 +12,9 @@ cd z_framework
 
 ### zf_term 
 echo " -- Linking zf_term .."
-ln -s ../../../zf_* .
+ln -s ../../../zf_term.* .
+echo " -- Linking zf_spritesheet .."
+ln -s ../../../zf_spritesheet.* .
 cd ..
 echo " -- Linking sample graphical font .."
-mkdir data/
-ln -s ../../../sample_graphics/font_32 data/font_32
+ln -s ../../sample_graphics/font_32 data/font_32

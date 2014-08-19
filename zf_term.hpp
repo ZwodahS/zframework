@@ -28,9 +28,13 @@
 /***
  * zf_term dependency :
  *      .1 zf_spritesheet.hpp
+ *      .2 zf_rect.hpp
+ *      .3 zf_sprite.hpp
  *
  */
 #include "zf_spritesheet.hpp"
+#include "zf_rect.hpp"
+#include "zf_sprite.hpp"
 namespace zf
 {
     //////////////////// special characters are used in term screen ////////////////////
@@ -43,26 +47,6 @@ namespace zf
     extern const int Fill;
     extern const int TotalSpecialChar;
 
-    //////////////////// Utility Methods ////////////////////
-    /**
-     * Get the right of the rect
-     */
-    int rightOf(const sf::IntRect& rect);
-    /**
-     * Get the bottom of the rect.
-     */
-    int bottomOf(const sf::IntRect& rect);
-    /**
-     * For completeness sake
-     */
-    int leftOf(const sf::IntRect& rect);
-    int topOf(const sf::IntRect& rect);
-
-    /**
-     * Try to fix the inner rect into out rect.
-     * This fit the inner rect using shrinking.
-     */
-    sf::IntRect& fitRectByShrinking(sf::IntRect& innerRect, const sf::IntRect& outerRect);
     //////////////////// TermCell ////////////////////
     /**
      * A single cell in the terminal.
@@ -82,11 +66,26 @@ namespace zf
     class TermWindow
     {
     public:
+        enum class TextAlignmentX
+        {
+            Left,
+            Center,
+            Right,
+        };
+
         TermWindow(TermScreen& screen); 
         ~TermWindow();
 
         friend TermScreen; 
         
+       /**
+        * Get bound returns the bound of this window within the screen.
+        * however, drawing always starts from 0.
+        *
+        * ALL position used by termWindow methods are relative to itself.
+        * It wouldn't make sense if you still need to care about the position of this window relative to the screen.
+        *
+        */ 
         const sf::IntRect& getBound() const;
         /**
          * Resize will attempt to resize to the size you want.
@@ -112,6 +111,7 @@ namespace zf
         void putSprite_f(const sf::Sprite& sprite);
         void putSprite_b(const sf::Sprite& sprite);
         void putSprite_fb(const sf::Sprite& fg, const sf::Sprite& bg);
+
         /**
          * move the cursor to the xy position and put
          * if the position specified is out of range. Nothing is done.
@@ -120,22 +120,34 @@ namespace zf
         void putSprite_xyb(int x, int y, const sf::Sprite& sprite);
         void putSprite_xyfb(int x, int y, const sf::Sprite& fg, const sf::Sprite& bg);
 
-
         /**
          * Put a string onto the screen. It is always placed at the foreground.
          */
-        void putString(const std::string& str);
-        void putString_xy(int x, int y, const std::string& str);
+        void putString(const std::string& str, const sf::Color& color = sf::Color(255, 255, 255, 255));
+        void putString_xy(int x, int y, const std::string& str, const sf::Color& color = sf::Color(255, 255, 255, 255));
+        void putString_row(int x, int y, int width, TextAlignmentX alignment, int offset, const std::string& message, const sf::Color& color = sf::Color(255, 255, 255, 255));
          
         const bool& isVisible() const;
 
         /**
-         * Draw border
+         * Draw border, edge border exist at the edge of the last tiles, while center border is in the middle of the tiles.
+         * Just try it ..
          */
-        void drawEdgeBorder();
-        void drawCenterBorder();
-        void hide();
-        void show();
+        void drawEdgeBorder(const sf::Color& color = sf::Color::White);
+        void drawCenterBorder(const sf::Color& color = sf::Color::White);
+        void drawEdgeBox(const sf::IntRect& bound, const sf::Color& color = sf::Color::White);
+        void drawCenterBox(const sf::IntRect& bound, const sf::Color& color = sf::Color::White);
+
+        /**
+         * clear the window by flooding the window with a single color.
+         */
+        void clear(const sf::Color& color = sf::Color(0, 0, 0, 255));
+        /**
+         * clear the window by setting all sprite to sf::Sprite()
+         */
+        void clearAllSprites();
+        void setVisible(bool visibility);
+        void bringToFront();
     private:
         void updateScreen();
         TermScreen& screen;
@@ -210,8 +222,8 @@ namespace zf
          * Create a new window in this region.
          * If the window is out of bound, it will automatically resize itself to fit in.
          */
-        TermWindow& newWindow(const sf::IntRect& bound);
-        TermWindow& newWindow(int x, int y, int width, int height);
+        TermWindow* newWindow(const sf::IntRect& bound);
+        TermWindow* newWindow(int x, int y, int width, int height);
 
         /**
          * Resize this rect to fit into this bound.
@@ -245,11 +257,13 @@ namespace zf
          * Only add range from 32 to 126(inclusive)
          * Return false if not in range.
          */
-        bool addChar(char c, const sf::Image& image);
-        TextureRegion getChar(char c);
+        bool addCharImage(char c, const sf::Image& image);
+        TextureRegion getChar(char c) const;
 
-        bool addSpecialChar(int c, const sf::Image& image);
-        TextureRegion getSpecialChar(int c);
+        bool addSpecialCharImage(int c, const sf::Image& image);
+        TextureRegion getSpecialChar(int c) const;
+
+        void bringToFront(TermWindow& window);
     private:
         /**
          * directly put this cell into this position.
