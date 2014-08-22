@@ -22,6 +22,10 @@
  */
 #ifndef _ZFRAMEWORK_ZF_CONVERSION_HPP_
 #define _ZFRAMEWORK_ZF_CONVERSION_HPP_
+/**
+ * zf_conversion dependency :
+ *      .1 zf_strings.hpp:
+ */
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
@@ -53,6 +57,8 @@ namespace zf
     std::string floatToString(float value, unsigned int numDecimal);
 
     std::string rectToString(const sf::IntRect& rect);
+    std::string vector2iToString(const sf::Vector2i& vect);
+    bool stringToVector2i(const std::string& str, sf::Vector2i& value);
 }
 
 #endif

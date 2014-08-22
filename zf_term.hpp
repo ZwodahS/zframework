@@ -61,7 +61,7 @@ namespace zf
         sf::Sprite background;
         TermCell(const sf::Sprite& foreground = sf::Sprite(), const sf::Sprite& background = sf::Sprite());
     };
-    class TermScreen;
+    class Terminal;
     //////////////////// TermWindow ////////////////////
     class TermWindow
     {
@@ -73,10 +73,10 @@ namespace zf
             Right,
         };
 
-        TermWindow(TermScreen& screen); 
+        TermWindow(Terminal& screen); 
         ~TermWindow();
 
-        friend TermScreen; 
+        friend Terminal; 
         
        /**
         * Get bound returns the bound of this window within the screen.
@@ -150,7 +150,7 @@ namespace zf
         void bringToFront();
     private:
         void updateScreen();
-        TermScreen& screen;
+        Terminal& screen;
         sf::IntRect bound;
         /**
          * Following the convention of ncurses in a way.
@@ -164,11 +164,11 @@ namespace zf
          */
         void advanceCursor();
     };
-    //////////////////// TermScreen ////////////////////
+    //////////////////// Terminal ////////////////////
     /**
      * The core screen.
      */
-    class TermScreen
+    class Terminal
     {
     public:
         const TextureRegion emptyRegion = TextureRegion();
@@ -176,8 +176,8 @@ namespace zf
          * window defines the window that is used.
          * termSize defines the number of rows and columns
          */
-        TermScreen(sf::RenderWindow& window, const sf::Vector2i& termSize);
-        ~TermScreen();
+        Terminal(sf::RenderWindow& window, const sf::Vector2i& termSize);
+        ~Terminal();
 
         /**
          * Init method must be called. 

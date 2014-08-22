@@ -21,6 +21,7 @@
  * http://sam.zoy.org/wtfpl/COPYING for more details.
  */
 #include "zf_conversion.hpp"
+#include "zf_strings.hpp"
 #include <sstream>
 namespace zf
 {
@@ -90,5 +91,27 @@ namespace zf
     std::string rectToString(const sf::IntRect& rect)
     {
         return intToString(rect.left) + " " + intToString(rect.top) + " " + intToString(rect.width) + " " + intToString(rect.height);
+    }
+
+    std::string vector2iToString(const sf::Vector2i& vect)
+    {
+        return intToString(vect.x) + "," + intToString(vect.y);
+    }
+
+    bool stringToVector2i(const std::string& str, sf::Vector2i& value)
+    {
+        auto split = zf::splitStringByDelimiter(str, ',');
+        if (split.size() != 2)
+        {
+            return false;
+        }
+        int x, y;
+        if (!stringToInt(split[0], x) || !stringToInt(split[1], y))
+        {
+            return false;
+        }
+        value.x = x;
+        value.y = y;
+        return true;
     }
 }

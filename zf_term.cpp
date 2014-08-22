@@ -43,7 +43,7 @@ namespace zf
     }
     
     //////////////////// TermWindow ////////////////////
-    TermWindow::TermWindow(TermScreen& screen)
+    TermWindow::TermWindow(Terminal& screen)
         : screen(screen), cursor(0, 0), visible(true)
     {
     }
@@ -208,27 +208,27 @@ namespace zf
         {
             return;
         }
-        putSprite_xyb(boxBound.left, boxBound.top, zf::setCopyColor(screen.getSpecialChar(Border[NORTH_BIT | WEST_BIT]).createSprite(), color));
+        putSprite_xyf(boxBound.left, boxBound.top, zf::setCopyColor(screen.getSpecialChar(Border[NORTH_BIT | WEST_BIT]).createSprite(), color));
         sf::Sprite top = zf::setCopyColor(screen.getSpecialChar(Border[NORTH_BIT]).createSprite(), color);
         for (int i = 0; i < boxBound.width - 2; i++)
         {
-            putSprite_b(top);
+            putSprite_f(top);
         }
-        putSprite_xyb(rightOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[NORTH_BIT | EAST_BIT]).createSprite(), color));
+        putSprite_xyf(rightOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[NORTH_BIT | EAST_BIT]).createSprite(), color));
         sf::Sprite left = zf::setCopyColor(screen.getSpecialChar(Border[WEST_BIT]).createSprite(), color);
         sf::Sprite right = zf::setCopyColor(screen.getSpecialChar(Border[EAST_BIT]).createSprite(), color);
         for (int y = 1; y < boxBound.height - 1; y++)
         {
-            putSprite_xyb(leftOf(boxBound), boxBound.top + y, left);
-            putSprite_xyb(rightOf(boxBound), boxBound.top + y, right);
+            putSprite_xyf(leftOf(boxBound), boxBound.top + y, left);
+            putSprite_xyf(rightOf(boxBound), boxBound.top + y, right);
         }
-        putSprite_xyb(leftOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[SOUTH_BIT | WEST_BIT]).createSprite(), color));
+        putSprite_xyf(leftOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[SOUTH_BIT | WEST_BIT]).createSprite(), color));
         sf::Sprite bottom = zf::setCopyColor(screen.getSpecialChar(Border[SOUTH_BIT]).createSprite(), color);
         for (int i = 0; i < boxBound.width - 2; i++)
         {
-            putSprite_b(bottom);
+            putSprite_f(bottom);
         }
-        putSprite_xyb(rightOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[SOUTH_BIT | EAST_BIT]).createSprite(), color));
+        putSprite_xyf(rightOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Border[SOUTH_BIT | EAST_BIT]).createSprite(), color));
     }
 
     void TermWindow::drawCenterBox(const sf::IntRect& boxBound, const sf::Color& color)
@@ -237,25 +237,25 @@ namespace zf
         {
             return;
         }
-        putSprite_xyb(leftOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[SOUTH_BIT | EAST_BIT]).createSprite(), color));
+        putSprite_xyf(leftOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[SOUTH_BIT | EAST_BIT]).createSprite(), color));
         sf::Sprite horizontal = zf::setCopyColor(screen.getSpecialChar(Cross[EAST_BIT | WEST_BIT]).createSprite(), color);
         for (int i = 0; i < boxBound.width - 2; i++)
         {
-            putSprite_b(horizontal);
+            putSprite_f(horizontal);
         }
-        putSprite_xyb(rightOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[SOUTH_BIT | WEST_BIT]).createSprite(), color));
+        putSprite_xyf(rightOf(boxBound), topOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[SOUTH_BIT | WEST_BIT]).createSprite(), color));
         sf::Sprite vertical = zf::setCopyColor(screen.getSpecialChar(Cross[NORTH_BIT|SOUTH_BIT]).createSprite(), color);
         for (int y = 1; y < boxBound.height - 1; y++)
         {
-            putSprite_xyb(leftOf(boxBound), boxBound.top + y, vertical);
-            putSprite_xyb(rightOf(boxBound), boxBound.top + y, vertical);
+            putSprite_xyf(leftOf(boxBound), boxBound.top + y, vertical);
+            putSprite_xyf(rightOf(boxBound), boxBound.top + y, vertical);
         }
-        putSprite_xyb(leftOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[NORTH_BIT | EAST_BIT]).createSprite(), color));
+        putSprite_xyf(leftOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[NORTH_BIT | EAST_BIT]).createSprite(), color));
         for (int i = 0; i < boxBound.width - 2; i++)
         {
-            putSprite_b(horizontal);
+            putSprite_f(horizontal);
         }
-        putSprite_xyb(rightOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[NORTH_BIT | WEST_BIT]).createSprite(), color));
+        putSprite_xyf(rightOf(boxBound), bottomOf(boxBound), zf::setCopyColor(screen.getSpecialChar(Cross[NORTH_BIT | WEST_BIT]).createSprite(), color));
     }
 
     void TermWindow::clear(const sf::Color& clearColor)
@@ -319,8 +319,8 @@ namespace zf
         }
     }
 
-    //////////////////// TermScreen ////////////////////
-    TermScreen::TermScreen(sf::RenderWindow& window, const sf::Vector2i& termSize)
+    //////////////////// Terminal ////////////////////
+    Terminal::Terminal(sf::RenderWindow& window, const sf::Vector2i& termSize)
         : renderWindow(window), termBound(0, 0, termSize.x, termSize.y)
         , charTexture(nullptr), inited(false)
     {
@@ -336,7 +336,7 @@ namespace zf
         }
     }
 
-    TermScreen::~TermScreen()
+    Terminal::~Terminal()
     {
         for (auto window : windows)
         {
@@ -348,7 +348,7 @@ namespace zf
         }
     }
 
-    void TermScreen::init(const sf::Vector2i& cellSize, const sf::Vector2i& spriteSize)
+    void Terminal::init(const sf::Vector2i& cellSize, const sf::Vector2i& spriteSize)
     {
         if (inited)
         {
@@ -402,22 +402,22 @@ namespace zf
         }
     }
 
-    const sf::IntRect& TermScreen::getTermBound() const
+    const sf::IntRect& Terminal::getTermBound() const
     {
         return termBound;
     }
 
-    const sf::Vector2i& TermScreen::getCellSize() const
+    const sf::Vector2i& Terminal::getCellSize() const
     {
         return cellSize;
     }
 
-    bool TermScreen::inRange(int x, int y) const
+    bool Terminal::inRange(int x, int y) const
     {
         return termBound.contains(x, y);
     }
 
-    void TermScreen::updateRenderWindow()
+    void Terminal::updateRenderWindow()
     {
         for (auto window : windows)
         {
@@ -439,13 +439,13 @@ namespace zf
         }
     }
 
-    sf::IntRect TermScreen::resize(const sf::IntRect& rect) const
+    sf::IntRect Terminal::resize(const sf::IntRect& rect) const
     {
         sf::IntRect r = rect;
         return fitRectByShrinking(r, termBound);
     }
     
-    void TermScreen::freeWindow(TermWindow& window)
+    void Terminal::freeWindow(TermWindow& window)
     {
         auto result = std::find(windows.begin(), windows.end(), &window);
         if (result != windows.end())
@@ -455,12 +455,12 @@ namespace zf
         delete &window;
     }
 
-    TermWindow* TermScreen::newWindow(const sf::IntRect& bound)
+    TermWindow* Terminal::newWindow(const sf::IntRect& bound)
     {
         return newWindow(bound.left, bound.top, bound.width, bound.height);
     }
 
-    TermWindow* TermScreen::newWindow(int x, int y, int width, int height)
+    TermWindow* Terminal::newWindow(int x, int y, int width, int height)
     {
         TermWindow* window = new TermWindow(*this);
         window->resize(x, y, width, height);
@@ -468,7 +468,7 @@ namespace zf
         return window;
     }
 
-    void TermScreen::directPut(const TermCell& cell, int x, int y)
+    void Terminal::directPut(const TermCell& cell, int x, int y)
     {
         if (inRange(x, y))
         {
@@ -479,7 +479,7 @@ namespace zf
         }
     }
 
-    void TermScreen::autoLoad(const std::string& path)
+    void Terminal::autoLoad(const std::string& path)
     {
         if (!charTexture)
         {
@@ -519,7 +519,7 @@ namespace zf
         } 
     }
 
-    bool TermScreen::addCharImage(char c, const sf::Image& image)
+    bool Terminal::addCharImage(char c, const sf::Image& image)
     {
         TextureRegion charRegion = getChar(c);
         if (charRegion.texture)
@@ -530,7 +530,7 @@ namespace zf
         return false;
     }
     
-    TextureRegion TermScreen::getChar(char c) const
+    TextureRegion Terminal::getChar(char c) const
     {
         if ((int)c < 32 || (int)c >= 127)
         {
@@ -540,7 +540,7 @@ namespace zf
         return characters.size() > c ? characters[int(c)] : emptyRegion;
     }
 
-    bool TermScreen::addSpecialCharImage(int c, const sf::Image& image)
+    bool Terminal::addSpecialCharImage(int c, const sf::Image& image)
     {
         TextureRegion charRegion = getSpecialChar(c);
         if (charRegion.texture)
@@ -551,7 +551,7 @@ namespace zf
         return false;
     }
 
-    TextureRegion TermScreen::getSpecialChar(int c) const
+    TextureRegion Terminal::getSpecialChar(int c) const
     {
         if (specialCharacters.size() > c && c >= 0)
         {
@@ -560,7 +560,7 @@ namespace zf
         return emptyRegion;
     }
 
-    void TermScreen::bringToFront(TermWindow& window)
+    void Terminal::bringToFront(TermWindow& window)
     {
         for (auto it = windows.begin(); it != windows.end();)
         {
