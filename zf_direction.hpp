@@ -40,7 +40,6 @@ namespace zf
         NorthWest,
     };
 
-
     const Direction AdjacentDirection[4] = { Direction::North, Direction::East, Direction::South, Direction::West };
     const Direction SurroundingDirection[8] = { Direction::North, Direction::NorthEast, Direction::East, Direction::SouthEast, Direction::South, Direction::SouthWest, Direction::West, Direction::NorthWest };
     const Direction AllDirection[9] = { Direction::None, Direction::North, Direction::NorthEast, Direction::East, Direction::SouthEast, Direction::South, Direction::SouthWest, Direction::West, Direction::NorthWest };
@@ -51,5 +50,19 @@ namespace zf
     int getIntValue(Direction direction);
     std::string directionToString(Direction direction);
     bool stringToDirection(const std::string&, Direction& direction);
+
+    /**
+     * Convert to bit value.
+     * None : 0
+     * North : 1
+     * East : 2
+     * South : 4
+     * West : 8
+     * NorthEast : 3
+     * SouthEast : 6
+     * SouthWest : 12
+     * NorthWest : 9
+     */
+    int toBit(Direction direction);
 }
 #endif

@@ -75,4 +75,20 @@ namespace zf
         }
         return false;
     }
+
+    int toBit(Direction direction)
+    {
+        switch(direction)
+        {
+            case Direction::None  : return 0;
+            case Direction::North : return 1;
+            case Direction::East  : return 2;
+            case Direction::South : return 4;
+            case Direction::West  : return 8;
+            case Direction::NorthEast : return toBit(Direction::North) | toBit(Direction::East);
+            case Direction::NorthWest : return toBit(Direction::North) | toBit(Direction::West);
+            case Direction::SouthEast : return toBit(Direction::South) | toBit(Direction::East);
+            case Direction::SouthWest : return toBit(Direction::South) | toBit(Direction::West);
+        }
+    }
 }

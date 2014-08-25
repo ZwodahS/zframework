@@ -17,6 +17,9 @@ namespace zf
      */
     int leftOf(const sf::IntRect& rect);
     int topOf(const sf::IntRect& rect);
+
+    sf::IntRect& move(sf::IntRect& rect, const sf::Vector2i& moveVect);
+    sf::IntRect moveCopy(sf::IntRect rect, const sf::Vector2i& moveVect);
     
     sf::IntRect& setRectByCorners(sf::IntRect& rect, int left, int top, int right, int bottom);
     /**
@@ -28,6 +31,6 @@ namespace zf
     /**
      * Center the rect with respect to referenceRect.
      */
-    sf::IntRect centerRegion(const sf::IntRect& rect, const sf::IntRect& referenceRect);
+    sf::IntRect centerRect(const sf::IntRect& rect, const sf::IntRect& referenceRect);
 }
 #endif

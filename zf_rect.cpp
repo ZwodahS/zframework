@@ -22,6 +22,18 @@ namespace zf
         return rect.top;
     }
 
+    sf::IntRect& move(sf::IntRect& rect, const sf::Vector2i& moveVect)
+    {
+        rect.left += moveVect.x;
+        rect.top += moveVect.y;
+        return rect;
+    }
+
+    sf::IntRect moveCopy(sf::IntRect rect, const sf::Vector2i& moveVect)
+    {
+        return move(rect, moveVect);
+    }
+
     sf::IntRect& setRectByCorners(sf::IntRect& rect, int left, int top, int right, int bottom)
     {
         rect.left = left;
@@ -47,5 +59,13 @@ namespace zf
         iBottom = iBottom > oBottom ? oBottom : iBottom;
         return setRectByCorners(innerRect, iLeft, iTop, iRight, iBottom);
     }
-
+    
+    
+    sf::IntRect centerRect(const sf::IntRect& rect, const sf::IntRect& referenceRect)
+    {
+        // calculate the spare space.
+        int spareX = referenceRect.width - rect.width;
+        int spareY = referenceRect.height - rect.height;
+        return sf::IntRect(referenceRect.left + spareX / 2, referenceRect.top + spareY / 2, rect.width, rect.height);
+    }
 }

@@ -25,6 +25,9 @@
 namespace zf
 {
     //////////////////// special characters ////////////////////
+    /**
+     * The bit here mirrors that of zf_direction
+     */
     const int NORTH_BIT = 1;
     const int EAST_BIT = 2;
     const int SOUTH_BIT = 4;
@@ -33,8 +36,14 @@ namespace zf
     const int Cross[16] = {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
     const int Center_dot = 32;
     const int Alternate[2] = { 33, 34 };
-    const int Fill = 35;
+    const int Up = 0;
+    const int Right = 1;
+    const int Down = 2;
+    const int Left = 3;
+    const int Arrow[4] = { 35, 36 , 37, 38 };
+    const int Fill = 39;
     const int TotalSpecialChar = Fill + 1;
+    const int TotalRequired = 127 - 32 + TotalSpecialChar;
 
     //////////////////// TermCell ////////////////////
     TermCell::TermCell(const sf::Sprite& fg, const sf::Sprite& bg)
@@ -187,6 +196,21 @@ namespace zf
         }
     }
 
+    void TermWindow::putChar(char c, const sf::Color& color)
+    {
+        auto sprite = screen.getChar(c).createSprite();
+        sprite.setColor(color);
+        putSprite_f(sprite);
+    }
+
+    void TermWindow::putChar_xy(int x, int y, char c, const sf::Color& color)
+    {
+        if (moveCursor(x, y))
+        {
+            putChar(c, color);
+        }
+    }
+
     const bool& TermWindow::isVisible() const
     {
         return visible;
@@ -260,11 +284,17 @@ namespace zf
 
     void TermWindow::clear(const sf::Color& clearColor)
     {
+        clear_r(sf::IntRect(0, 0, bound.width, bound.height), clearColor);
+    }
+
+    void TermWindow::clear_r(sf::IntRect region, const sf::Color& color)
+    {
+        region = zf::fitRectByShrinking(region, sf::IntRect(0, 0, bound.width, bound.height));
         sf::Sprite fill = screen.getSpecialChar(Fill).createSprite();
-        fill.setColor(clearColor);
-        for (int x = 0; x < bound.width; x++)
+        fill.setColor(color);
+        for (int x = 0; x < region.width; x++)
         {
-            for (int y = 0; y < bound.height; y++)
+            for (int y = 0; y < region.height; y++)
             {
                 cells[x][y].foreground = sf::Sprite();
                 cells[x][y].background = fill;
@@ -272,11 +302,17 @@ namespace zf
         }
     }
 
-    void TermWindow::clearAllSprites()
+    void TermWindow::empty()
     {
-        for (int x = 0; x < bound.width; x++)
+        empty_r(sf::IntRect(0, 0, bound.width, bound.height));
+    }
+
+    void TermWindow::empty_r(sf::IntRect region)
+    {
+        region = zf::fitRectByShrinking(region, sf::IntRect(0, 0, bound.width, bound.height));
+        for (int x = 0; x < region.width; x++)
         {
-            for (int y = 0; y < bound.height; y++)
+            for (int y = 0; y < region.height; y++)
             {
                 cells[x][y].foreground = sf::Sprite();
                 cells[x][y].background = sf::Sprite();
@@ -294,13 +330,26 @@ namespace zf
         screen.bringToFront(*this);
     }
 
-    void TermWindow::updateScreen() 
+    void TermWindow::updateScreen(bool putMode) 
     {
-        for (int x = 0; x < bound.width; x++)
+        if (putMode)
         {
-            for (int y = 0; y < bound.height; y++)
+            for (int x = 0; x < bound.width; x++)
             {
-                screen.directPut(cells[x][y], x + bound.left, y + bound.top);
+                for (int y = 0; y < bound.height; y++)
+                {
+                    screen.directPut(cells[x][y], x + bound.left, y + bound.top);
+                }
+            }
+        }
+        else
+        {
+            for (int x = 0; x < bound.width; x++)
+            {
+                for (int y = 0; y < bound.height; y++)
+                {
+                    screen.directDraw(cells[x][y], x + bound.left, y + bound.top);
+                }
             }
         }
     }
@@ -348,7 +397,7 @@ namespace zf
         }
     }
 
-    void Terminal::init(const sf::Vector2i& cellSize, const sf::Vector2i& spriteSize)
+    void Terminal::init(const sf::Vector2i& cellSize, const sf::Vector2i& spriteSize, const int maxRow, const int maxCol)
     {
         if (inited)
         {
@@ -356,14 +405,11 @@ namespace zf
         }
         inited = true;
         this->cellSize = cellSize;
-        const int ROW = 15;
-        const int COL = 15;
         ascii_starts = 0;
         ascii_ends = ascii_starts;
 
         float scale = cellSize.x * 1.0f / spriteSize.x;
-
-        const sf::Vector2i spritesheetSize(spriteSize.x * COL, spriteSize.y * ROW);
+        const sf::Vector2i spritesheetSize(spriteSize.x * maxCol, spriteSize.y * maxRow);
         {
             charTexture = new sf::Texture();
             charTexture->create(spritesheetSize.x, spritesheetSize.y);
@@ -376,14 +422,14 @@ namespace zf
                 region.defaultScaleY = scale;
                 characters.push_back(region);
                 col++;
-                if (col == COL)
+                if (col == maxCol)
                 {
                     col = 0;
                     row++;
                 }
                 ascii_ends++;
             }
-            special_starts = ascii_ends + 1;
+            special_starts = ascii_ends;
             special_ends = special_starts;
             for (int i = 0; i < TotalSpecialChar; i++)
             {
@@ -392,12 +438,26 @@ namespace zf
                 region.defaultScaleY = scale;
                 specialCharacters.push_back(region);
                 col++;
-                if (col == COL)
+                if (col == maxCol)
                 {
                     col = 0;
                     row++;
                 }
                 special_ends++;
+            }
+            while(row != maxRow)
+            {
+                // create all the spare location
+                auto region = charSpriteSheet.createRegion(sf::IntRect(col * spriteSize.x, row * spriteSize.y, spriteSize.x, spriteSize.y));
+                region.defaultScaleX = scale;
+                region.defaultScaleY = scale;
+                specialCharacters.push_back(region);
+                col++;
+                if (col == maxCol)
+                {
+                    col = 0;
+                    row++;
+                }
             }
         }
     }
@@ -417,24 +477,27 @@ namespace zf
         return termBound.contains(x, y);
     }
 
-    void Terminal::updateRenderWindow()
+    void Terminal::updateRenderWindow(bool singleDraw)
     {
         for (auto window : windows)
         {
             if (window->isVisible())
             {
-                window->updateScreen();
+                window->updateScreen(singleDraw);
             }
         }
-        /**
-         * We always assume that the sprites are already in the correct position.
-         */
-        for (int x = 0; x < termBound.width; x++)
+        if (singleDraw)
         {
-            for (int y = 0; y < termBound.height; y++)
+            /**
+             * We always assume that the sprites are already in the correct position.
+             */
+            for (int x = 0; x < termBound.width; x++)
             {
-                renderWindow.draw(cells[x][y].background);
-                renderWindow.draw(cells[x][y].foreground);
+                for (int y = 0; y < termBound.height; y++)
+                {
+                    renderWindow.draw(cells[x][y].background);
+                    renderWindow.draw(cells[x][y].foreground);
+                }
             }
         }
     }
@@ -479,6 +542,17 @@ namespace zf
         }
     }
 
+    void Terminal::directDraw(TermCell& cell, int x, int y)
+    {
+        if (inRange(x, y))
+        {
+            cell.foreground.setPosition(x * cellSize.x, y * cellSize.y);
+            cell.background.setPosition(x * cellSize.y, y * cellSize.y);
+            renderWindow.draw(cell.background);
+            renderWindow.draw(cell.foreground);
+        }
+    }
+
     void Terminal::autoLoad(const std::string& path)
     {
         if (!charTexture)
@@ -490,7 +564,7 @@ namespace zf
         /// basic ascii character
         for (int i = 32; i < 127; i++)
         {
-            image.loadFromFile(path + "/basic/" + std::to_string(i) + ".png");
+            image.loadFromFile(path + "/basic/" + intToString(i) + ".png");
             if (!addCharImage(i, image))
             {
                 std::cout << "-- Fail to add char " << char(i) << std::endl;
@@ -499,15 +573,19 @@ namespace zf
         std::vector<std::string> extendedLoadStrings;
         for (int i = 0; i < 16; i++)
         {
-            extendedLoadStrings.push_back("border_" + std::to_string(i) + ".png");
+            extendedLoadStrings.push_back("border_" + intToString(i) + ".png");
         }
         for (int i = 0; i < 16; i++)
         {
-            extendedLoadStrings.push_back("cross_" + std::to_string(i) + ".png");
+            extendedLoadStrings.push_back("cross_" + intToString(i) + ".png");
         }
         extendedLoadStrings.push_back("center_dot.png");
         extendedLoadStrings.push_back("alternate_1.png");
         extendedLoadStrings.push_back("alternate_2.png");
+        extendedLoadStrings.push_back("arrow_up.png");
+        extendedLoadStrings.push_back("arrow_right.png");
+        extendedLoadStrings.push_back("arrow_down.png");
+        extendedLoadStrings.push_back("arrow_left.png");
         extendedLoadStrings.push_back("fill.png");
         for (int i = 0; i < extendedLoadStrings.size(); i++)
         {
