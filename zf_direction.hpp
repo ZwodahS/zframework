@@ -2,7 +2,7 @@
  *           DO WHAT THE F*** YOU WANT TO PUBLIC LICENSE
  *                   Version 2, December 2004
  *
- * Copyright (C) 2013- ZwodahS(ericnjf@gmail.com)
+ * Copyright (C) 2014- ZwodahS(ericnjf@gmail.com)
  * zwodahs.github.io
  *
  * Everyone is permitted to copy and distribute verbatim or modified
@@ -20,6 +20,7 @@
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details.
  *
+ * visit http://github.com/ZwodahS/zframework for the latest version
  */
 #ifndef _ZFRAMEWORK_ZF_DIRECTION_HPP_
 #define _ZFRAMEWORK_ZF_DIRECTION_HPP_
