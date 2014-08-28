@@ -18,7 +18,7 @@ public:
 private:
     std::string title;
     sf::RenderWindow* window;
-    zf::TermScreen* screen;
+    zf::Terminal* screen;
 
     sf::Vector2i termSize;
     sf::Vector2i cellSize;

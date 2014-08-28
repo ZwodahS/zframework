@@ -22,7 +22,7 @@ void Example::init(const std::string& title, const sf::Vector2i& termSize, const
     this->screenSize.y = termSize.y * cellSize.y;
     window = new sf::RenderWindow(sf::VideoMode(screenSize.x, screenSize.y), title);
     window->setFramerateLimit(60);
-    screen = new zf::TermScreen(*window, termSize);
+    screen = new zf::Terminal(*window, termSize);
     screen->init(cellSize, sf::Vector2i(32, 32));
     screen->autoLoad("data/font_32");
 }
