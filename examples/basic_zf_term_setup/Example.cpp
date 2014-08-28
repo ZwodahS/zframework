@@ -22,8 +22,8 @@ void Example::init(const std::string& title, const sf::Vector2i& termSize, const
     this->screenSize.y = termSize.y * cellSize.y;
     window = new sf::RenderWindow(sf::VideoMode(screenSize.x, screenSize.y), title);
     window->setFramerateLimit(60);
-    screen = new zf::TermScreen(*window, termSize);
-    screen->init(cellSize);
+    screen = new zf::Terminal(*window, termSize);
+    screen->init(cellSize, sf::Vector2i(32, 32));
     
 }
 
@@ -35,7 +35,7 @@ void Example::run()
     /**
      * Create a terminal window that occupies the entire screen.
      */
-    zf::TermWindow& board = screen->newWindow(sf::IntRect(0, 0, termSize.x, termSize.y));
+    zf::TermWindow* board = screen->newWindow(sf::IntRect(0, 0, termSize.x, termSize.y));
 
     /**
      * Loading of assets
@@ -64,6 +64,9 @@ void Example::run()
                 quit = true;
             }
         }
+        
+        board->putSprite_xyf(3, 3, blackSprite);
+        board->putSprite_xyf(4, 4, whiteSprite); 
 
         if (!quit)
         {
