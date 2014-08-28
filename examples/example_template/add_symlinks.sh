@@ -11,10 +11,12 @@ cd z_framework
 #### uncomment to link the respective file ####
 
 ### zf_term 
-echo " -- Linking zf_term .."
-ln -s ../../../zf_term.* .
-echo " -- Linking zf_spritesheet .."
-ln -s ../../../zf_spritesheet.* .
-cd ..
+for F in zf_term zf_spritesheet zf_rect zf_sprite zf_conversion zf_strings
+do
+    echo " -- linking $F "
+    ln -s ../../../${F}.* .
+done
 echo " -- Linking sample graphical font .."
-ln -s ../../sample_graphics/font_32 data/font_32
+cd ..
+mkdir data/
+ln -s ../../../sample_graphics/font_32 data/font_32
