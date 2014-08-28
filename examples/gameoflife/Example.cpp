@@ -102,7 +102,7 @@ void Example::init(const std::string& title, const sf::Vector2i& boardSize, cons
     this->screenSize.y = boardSize.y * cellSize.y;
     window = new sf::RenderWindow(sf::VideoMode(screenSize.x, screenSize.y), title);
     window->setFramerateLimit(60);
-    screen = new zf::TermScreen(*window, boardSize);
+    screen = new zf::Terminal(*window, boardSize);
     screen->init(cellSize, cellSize);
     
 }
@@ -115,7 +115,7 @@ void Example::run()
     /**
      * Create a terminal window that occupies the entire screen.
      */
-    zf::TermWindow& board = screen->newWindow(sf::IntRect(0, 0, boardSize.x, boardSize.y));
+    zf::TermWindow* board = screen->newWindow(sf::IntRect(0, 0, boardSize.x, boardSize.y));
 
     /**
      * Loading of assets
@@ -176,7 +176,7 @@ void Example::run()
                 {
                     for (int y = 0; y < boardSize.y; y++)
                     {
-                        board.putSprite_xyb(x, y, cells[x][y]->aliveNow ? whiteSprite : blackSprite);
+                        board->putSprite_xyb(x, y, cells[x][y]->aliveNow ? whiteSprite : blackSprite);
                     }
                 }
                 timePassed -= updateFrequency;
