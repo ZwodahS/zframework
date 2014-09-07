@@ -91,10 +91,10 @@ namespace zf
         }
     }
 
-    TiledWindow* TiledWindowFactory::newWindow(const sf::Vector2i& windowSize, int cellSize)
+    TiledWindow* TiledWindowFactory::newWindow(const sf::Vector2i& _windowSize, int cellSize)
     {
         TiledWindow* window = new TiledWindow(*this);
-        window->init(windowSize, cellSize, imageSize);
+        window->init(_windowSize, cellSize, imageSize);
         return window;
     }
 
@@ -233,25 +233,25 @@ namespace zf
     }
 
     TiledWindow::TiledWindow(TiledWindowFactory& factory)
-        : factory(factory), windowSize(0, 0), windowPosition(0, 0)
+        : factory(factory), _windowSize(0, 0), windowPosition(0, 0), windowSize(_windowSize)
     {
     }
 
     TiledWindow::~TiledWindow()
     {
-        foreach_xy(cells, 0, 0, windowSize.x, windowSize.y, [] (int x, int y, TiledWindow::Cell* cell) { delete cell; });
+        foreach_xy(cells, 0, 0, _windowSize.x, _windowSize.y, [] (int x, int y, TiledWindow::Cell* cell) { delete cell; });
     }
 
-    TiledWindow& TiledWindow::init(const sf::Vector2i& windowSize, int cellSize, int imageSize)
+    TiledWindow& TiledWindow::init(const sf::Vector2i& _windowSize, int cellSize, int imageSize)
     {
-        foreach_xy(cells, 0, 0, windowSize.x, windowSize.y, [] (int x, int y, TiledWindow::Cell* cell) { delete cell; });
-        this->windowSize = windowSize;
+        foreach_xy(cells, 0, 0, _windowSize.x, _windowSize.y, [] (int x, int y, TiledWindow::Cell* cell) { delete cell; });
+        this->_windowSize = _windowSize;
         this->cellSize = cellSize;
         this->scaling = 1.0f * cellSize / imageSize;
-        for (int x = 0; x < windowSize.x; x++)
+        for (int x = 0; x < _windowSize.x; x++)
         {
             std::vector<Cell*> innerCells;
-            for (int y = 0; y < windowSize.y; y++)
+            for (int y = 0; y < _windowSize.y; y++)
             {
                 innerCells.push_back(new Cell());
             }
@@ -264,17 +264,17 @@ namespace zf
 
     const sf::Vector2i& TiledWindow::getWindowSize() const
     {
-        return windowSize;
+        return _windowSize;
     }
     
-    sf::FloatRect TiledWindow::getRenderSize() const
+    sf::FloatRect TiledWindow::getRenderBound() const
     {
-        return sf::FloatRect(windowPosition.x, windowPosition.y, windowSize.x * cellSize, windowSize.y * cellSize);
+        return sf::FloatRect(windowPosition.x, windowPosition.y, _windowSize.x * cellSize, _windowSize.y * cellSize);
     }
 
     bool TiledWindow::inRange(int x, int y) const
     {
-        bool temp = x >= 0 && y >= 0 && x < windowSize.x && y < windowSize.y;
+        bool temp = x >= 0 && y >= 0 && x < _windowSize.x && y < _windowSize.y;
         return temp;
     }
 
@@ -297,12 +297,12 @@ namespace zf
     TiledWindow& TiledWindow::advanceCursor()
     {
         cursor.x += 1;
-        if (cursor.x >= windowSize.x)
+        if (cursor.x >= _windowSize.x)
         {
             cursor.x = 0;
             cursor.y += 1;
         }
-        if (cursor.y >= windowSize.y)
+        if (cursor.y >= _windowSize.y)
         {
             cursor.y = 0;
         }
@@ -328,6 +328,14 @@ namespace zf
         return *this;
     }
 
+    TiledWindow& TiledWindow::alignWindow(AlignmentX alignmentX, AlignmentY alignmentY, const sf::Vector2f& targetPosition, const sf::Vector2f& offset)
+    {
+        auto bound = getRenderBound();
+        zf::alignRect(bound, alignmentX, alignmentY, targetPosition, offset);
+        setWindowPosition(bound.left, bound.top);
+        return *this;
+    }
+
     TextureRegion TiledWindow::getChar(char c) const
     {
         auto region = factory.getChar(c);
@@ -346,7 +354,7 @@ namespace zf
     //////////////////////////////////// TiledWindow drawing methods ////////////////////////////////////
     TiledWindow& TiledWindow::clean()
     {
-        return clean(0, 0, windowSize.x, windowSize.y);
+        return clean(0, 0, _windowSize.x, _windowSize.y);
     }
     
     TiledWindow& TiledWindow::clean(int x, int y)
@@ -380,7 +388,7 @@ namespace zf
     ////////////////////
     TiledWindow& TiledWindow::fill(const sf::Color& color)
     {
-        return fill(0, 0, windowSize.x, windowSize.y, color);
+        return fill(0, 0, _windowSize.x, _windowSize.y, color);
     }
     
     TiledWindow& TiledWindow::fill(int x, int y, const sf::Color& color)
@@ -414,9 +422,9 @@ namespace zf
 
     TiledWindow& TiledWindow::draw(sf::RenderWindow& window)
     {
-        for (int y = 0; y < windowSize.y; y++)
+        for (int y = 0; y < _windowSize.y; y++)
         {
-            for (int x = 0; x < windowSize.x; x++)
+            for (int x = 0; x < _windowSize.x; x++)
             {
                 cells[x][y]->draw(x * cellSize + windowPosition.x, y * cellSize + windowPosition.y, window);
             }
@@ -443,19 +451,23 @@ namespace zf
         return *this;
     }
 
-    TiledWindow& TiledWindow::putString(int x, int y, int width, const std::string& str, TextAlignmentX alignment, int offset, const sf::Color& color)
+    TiledWindow& TiledWindow::putString(int x, int y, int width, const std::string& str, AlignmentX alignment, int offset, const sf::Color& color)
     {
-        if (alignment == TextAlignmentX::Left)
+        if (alignment == AlignmentX::Left)
         {
             return putString(x + offset, y, str, color);
         }
-        else if (alignment == TextAlignmentX::Right)
+        else if (alignment == AlignmentX::Right)
         {
             return putString(x + width - str.size() - offset, y, str, color);
         }
-        else 
+        else if (alignment == AlignmentX::Center)
         {
             return putString(x + (width - str.size())/2 + offset, y, str, color);
+        }
+        else
+        {
+            return putString(x + offset, y, str, color);
         }
     }
 
@@ -516,12 +528,12 @@ namespace zf
     //////////////////// border ////////////////////
     void TiledWindow::drawEdgeBorder(const sf::Color& color)
     {
-        drawEdgeBox(sf::IntRect(0, 0, windowSize.x, windowSize.y), color);
+        drawEdgeBox(sf::IntRect(0, 0, _windowSize.x, _windowSize.y), color);
     }
 
     void TiledWindow::drawCenterBorder(const sf::Color& color)
     {
-        drawCenterBox(sf::IntRect(0, 0, windowSize.x, windowSize.y), color);
+        drawCenterBox(sf::IntRect(0, 0, _windowSize.x, _windowSize.y), color);
     }
 
     //////////////////// box ////////////////////

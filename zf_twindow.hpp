@@ -33,6 +33,7 @@
  *      .2 zf_rect.hpp
  *      .3 zf_sprite.hpp
  *      .4 zf_conversion.hpp
+ *      .5 zf_alignment.hpp
  */
 #include "zf_spritesheet.hpp"
 #include "zf_rect.hpp"
@@ -89,7 +90,7 @@ namespace zf
 
         /**
          * Create a tile window with the specific values.
-         *      windowSize : the number of cells (x, and y) in the window
+         *      _windowSize : the number of cells (x, and y) in the window
          *      cellSize : the size of each size.
          *
          *      cellSize should be multiple of 4s
@@ -107,7 +108,7 @@ namespace zf
          *      28 = 0.875
          *      32 = 1
          */
-        TiledWindow* newWindow(const sf::Vector2i& windowSize, int cellSize);
+        TiledWindow* newWindow(const sf::Vector2i& _windowSize, int cellSize);
 
         void freeWindow(TiledWindow* window);
         
@@ -180,12 +181,6 @@ namespace zf
     {
     //////////////////// Internally used objects ////////////////////
     public:
-        enum class TextAlignmentX
-        {
-            Left,
-            Center,
-            Right,
-        };
         struct Cell
         {
             std::vector<sf::Sprite> sprites;
@@ -209,7 +204,7 @@ namespace zf
          * @param the cellsize of this window.
          * @param the image size of the factory
          */
-        TiledWindow& init(const sf::Vector2i& windowSize, int cellSize, int imageSize);
+        TiledWindow& init(const sf::Vector2i& _windowSize, int cellSize, int imageSize);
         TiledWindow& create();
         /**
          * Factory reference.
@@ -228,7 +223,7 @@ namespace zf
          * @return sf::Vector2i, number of columns in the x value, number of rows in the y value.
          */
         const sf::Vector2i& getWindowSize() const;
-        sf::FloatRect getRenderSize() const;
+        sf::FloatRect getRenderBound() const;
         /**
          * Check if this position is in range of the window.
          * @return true if the position is in the window.
@@ -241,6 +236,8 @@ namespace zf
         TiledWindow& moveWindow(const sf::Vector2f& moveVec);
         TiledWindow& setWindowPosition(const sf::Vector2f& position);
         TiledWindow& setWindowPosition(int x, int y);
+
+        TiledWindow& alignWindow(AlignmentX alignmentX, AlignmentY alignmentY, const sf::Vector2f& targetPosition, const sf::Vector2f& offset = sf::Vector2f(0, 0));
         /**
          * Get the texture region representing this character, and scale it properly for this window.
          * Scaling done using the scaling version in window.
@@ -251,6 +248,8 @@ namespace zf
          * Scaling done using the scaling version in window.
          */
         TextureRegion getSpecialChar(int c) const;
+
+        const sf::Vector2i& windowSize;
     private:
         /**
          * Move the cursor to the position
@@ -277,7 +276,7 @@ namespace zf
         /**
          * The number of cells in the window.
          */
-        sf::Vector2i windowSize;
+        sf::Vector2i _windowSize;
         /**
          * The window position
          */
@@ -315,7 +314,7 @@ namespace zf
         //////////////////// String drawing
         TiledWindow& putString(const std::string& str, const sf::Color& color = sf::Color::White);
         TiledWindow& putString(int x, int y, const std::string& str, const sf::Color& color = sf::Color::White);
-        TiledWindow& putString(int x, int y, int width, const std::string& str, TextAlignmentX alignment = TextAlignmentX::Left, int offset = 0, const sf::Color& color = sf::Color::White);
+        TiledWindow& putString(int x, int y, int width, const std::string& str, AlignmentX alignment = AlignmentX::Left, int offset = 0, const sf::Color& color = sf::Color::White);
         //////////////////// Sprite drawing
         TiledWindow& putSprite(const sf::Sprite& sprite);
         TiledWindow& putSprite(int x, int y, const sf::Sprite& sprite);
