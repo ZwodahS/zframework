@@ -24,8 +24,13 @@
  */
 #ifndef _ZFRAMEWORK_ZF_RECT_HPP_
 #define _ZFRAMEWORK_ZF_RECT_HPP_
-#include <SFML/Graphics.hpp>
 #include <string>
+#include <SFML/Graphics.hpp>
+/**
+ * zf_rect dependency :
+ *      .1 zf_alignment.hpp
+ */
+#include "zf_alignment.hpp"
 namespace zf
 {
     /**
@@ -56,5 +61,7 @@ namespace zf
      * Center the rect with respect to referenceRect.
      */
     sf::IntRect centerRect(const sf::IntRect& rect, const sf::IntRect& referenceRect);
+
+    sf::FloatRect& alignRect(sf::FloatRect& rect, AlignmentX xAlignment, AlignmentY yAlignment, const sf::Vector2f& target, const sf::Vector2f& offset = sf::Vector2f(0, 0));
 }
 #endif

@@ -92,4 +92,34 @@ namespace zf
         int spareY = referenceRect.height - rect.height;
         return sf::IntRect(referenceRect.left + spareX / 2, referenceRect.top + spareY / 2, rect.width, rect.height);
     }
+
+    sf::FloatRect& alignRect(sf::FloatRect& rect, AlignmentX xAlignment, AlignmentY yAlignment, const sf::Vector2f& target, const sf::Vector2f& offset)
+    {
+        if (xAlignment == AlignmentX::Left)
+        {
+            rect.left = target.x + offset.x;
+        }
+        else if (xAlignment == AlignmentX::Right)
+        {
+            rect.left = target.x - offset.x - rect.width;
+        }
+        else if (xAlignment == AlignmentX::Center)
+        {
+            rect.left = target.x - offset.x - rect.width / 2;
+        }
+        
+        if (yAlignment == AlignmentY::Top)
+        {
+            rect.top = target.y + offset.y;
+        }
+        else if (yAlignment == AlignmentY::Bottom)
+        {
+            rect.top = target.y - offset.y - rect.height;
+        }
+        else if (yAlignment == AlignmentY::Center)
+        {
+            rect.top = target.y - offset.y - rect.height / 2;
+        }
+        return rect;
+    }
 }

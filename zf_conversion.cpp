@@ -96,6 +96,11 @@ namespace zf
         return out;
     }
 
+    std::string charToString(char c)
+    {
+        return std::string(1, c);
+    }
+
     std::string rectToString(const sf::IntRect& rect)
     {
         return intToString(rect.left) + " " + intToString(rect.top) + " " + intToString(rect.width) + " " + intToString(rect.height);

@@ -22,28 +22,39 @@
  *
  * visit http://github.com/ZwodahS/zframework for the latest version
  */
-#ifndef _ZFRAMEWORK_ZF_STRINGS_HPP_
-#define _ZFRAMEWORK_ZF_STRINGS_HPP_
+#ifndef _ZFRAMEWORK_ZF_STRINGFORMAT_HPP_
+#define _ZFRAMEWORK_ZF_STRINGFORMAT_HPP_
+/** 
+ * zf_stringformat dependency
+ *      .1 zf_conversion
+ *      .2 zf_strings
+ */
 #include <string>
-#include <vector>
 namespace zf
 {
     /**
-     * Split a strings by a delimiter
+     * currently supports
+     *      %s for string
+     *      %i for int
+     *      %c for char
+     *      %f for float
+     * 
+     * Uses the conversion method in zf_conversion to work,
+     * doesn't care about single character %
+     * escaped % will not be replaced.
      */
-    std::vector<std::string>& splitStringByDelimiter(const std::string &s, char delim, std::vector<std::string> &elems);
-    std::vector<std::string> splitStringByDelimiter(const std::string &s, char delim);
-    /**
-     * Split a single strings into multiple strings, 
-     * each string in the return list have a maximum characters of "maxChar"
-     */
-    std::vector<std::string> splitStringByLength(const std::string& str, int maxChar);
-    
-    /**
-     * Check if longString starts with startString.
-     */
-    bool startsWith(const std::string& longString, const std::string& startString);
+    class Format
+    {
+    public:
+        Format(const std::string& str);
 
-    std::string& replaceString(std::string& original, const std::string& searchString, const std::string& replaceString, bool multipleReplace = true);
-}
+        Format& operator%(int i);
+        Format& operator%(char c);
+        Format& operator%(const std::string& str);
+
+        std::string str;
+    };
+
+    Format format(const std::string& str);
+};
 #endif

@@ -97,4 +97,27 @@ namespace zf
         std::size_t index = longStrings.find(startString);
         return index == 0;
     }
+
+    std::string& replaceString(std::string& newString, const std::string& searchString, const std::string& replaceString, bool multipleReplace)
+    {
+        size_t index = newString.find(searchString);
+        if(multipleReplace)
+        {
+            while(index != std::string::npos)
+            {
+                // replace
+                newString.replace(index, searchString.size(), replaceString);
+                // start searching from the end of the replaceString, such that the replaceString will never be part of the search
+                index = newString.find(searchString, index + replaceString.size());
+            }
+        }
+        else
+        {
+            if(index != std::string::npos)
+            {
+                newString.replace(index, searchString.size(), replaceString);
+            }
+        }
+        return newString;
+    }
 }

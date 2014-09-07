@@ -40,16 +40,13 @@ namespace zf
      * value is not changed if not successful.
      */
     bool stringToInt(const std::string& str, int& value);
-
     std::string intToString(int value);
-
     /**
      * convert a string to a bool, and place it in value.
      * return true if successul, false otherwise.
      * value is not changed if not successful
      */
     bool stringToBool(const std::string& str, bool& value);
-
     /**
      * convert a bool to a string.
      * convert true to "true" and false to "false"
@@ -57,6 +54,7 @@ namespace zf
     std::string boolToString(bool value);
     
     std::string floatToString(float value, unsigned int numDecimal);
+    std::string charToString(char c);
 
     std::string rectToString(const sf::IntRect& rect);
     std::string vector2iToString(const sf::Vector2i& vect);
