@@ -1,20 +1,24 @@
+# Summary
 This is a reconstruction of the older z\_framework that I have for cpp in the past.
 This isn't technically a framework, just bunch of useful code snippet thrown in a place.
 
-The primary reason for redoing the entire codebase is that I realized that I want to be able to just copy the file to anywhere and it will works.
+The primary reason for redoing the entire codebase is to make it such that to use the code, I just need to copy it into my project.
+This is inspired by the Dropbox json11 code.
 So instead of putting files and individiual classes into folders and files, I will put EVERYTHING into a single header file.
 The things that are implemented will be grouped by functionality.
 The file dependency will be laid out at the top of the files.
 The class/method dependency hopefully, will also be laid out at the beginning of every methods/class def.
 These will allow you to detect unused method and delete them appropriately.
-       
+      
+# Modules
+             
 ## zf\_alignment
 Defines the basic alignment enum used by various other parts.
 
 ## zf\_conversion
 Bunch of useful conversion methods 
 
-## zf\_directoin
+## zf\_direction
 Defines direction and modifiers.
 
 ## zf\_rect
@@ -43,7 +47,7 @@ This is a implementation similar to zf\_term. However, many of the curses like r
 For example, you can create various windows of different cell sizes.
 Primarily, it allows you to create a tiled game easier.
 
-
+# Usages
 The best way to use this codebase, is to treat them like snippets.
 Just copy them into your project anywhere you like and include them.
 You can remove those that you do not need, or even modify them to suit your needs.
