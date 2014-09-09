@@ -26,13 +26,13 @@
 #include <iostream>
 namespace zf
 {
-    const int TiledWindowFactory::NORTH_BIT = 1;
-    const int TiledWindowFactory::EAST_BIT = 2;
-    const int TiledWindowFactory::SOUTH_BIT = 4;
-    const int TiledWindowFactory::WEST_BIT = 8;
+    const int TiledWindowFactory::NorthBit = 1;
+    const int TiledWindowFactory::EastBit = 2;
+    const int TiledWindowFactory::SouthBit = 4;
+    const int TiledWindowFactory::WestBit = 8;
     const int TiledWindowFactory::Border[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
     const int TiledWindowFactory::Cross[16] = {16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
-    const int TiledWindowFactory::Center_dot = 32;
+    const int TiledWindowFactory::CenterDot = 32;
     const int TiledWindowFactory::Alternate[2] = { 33, 34 };
     const int TiledWindowFactory::Up = 0;
     const int TiledWindowFactory::Right = 1;
@@ -419,7 +419,7 @@ namespace zf
     {
         auto sprite = getSpecialChar(TiledWindowFactory::Fill).createSprite();
         sprite.setColor(color);
-        putSprite(x, y, sprite);
+        putSprite(sprite, x, y);
         return *this;
     }
 
@@ -431,7 +431,7 @@ namespace zf
         {
             for (int y = yStart; y < yStart + height; y++)
             {
-                putSprite(x, y, sprite);
+                putSprite(sprite, x, y);
             }
         }
         return *this;
@@ -466,7 +466,7 @@ namespace zf
         return *this;
     }
 
-    TiledWindow& TiledWindow::putString(int x, int y, const std::string& str, const sf::Color& color)
+    TiledWindow& TiledWindow::putString(const std::string& str, int x, int y, const sf::Color& color)
     {
         if (moveCursor(x, y))
         {
@@ -475,23 +475,23 @@ namespace zf
         return *this;
     }
 
-    TiledWindow& TiledWindow::putString(int x, int y, int width, const std::string& str, AlignmentX alignment, int offset, const sf::Color& color)
+    TiledWindow& TiledWindow::putString(const std::string& str, int x, int y, int width, AlignmentX alignment, int offset, const sf::Color& color)
     {
         if (alignment == AlignmentX::Left)
         {
-            return putString(x + offset, y, str, color);
+            return putString(str, x + offset, y, color);
         }
         else if (alignment == AlignmentX::Right)
         {
-            return putString(x + width - str.size() - offset, y, str, color);
+            return putString(str, x + width - str.size(), y, color);
         }
         else if (alignment == AlignmentX::Center)
         {
-            return putString(x + (width - str.size())/2 + offset, y, str, color);
+            return putString(str, x + (width - str.size())/2 + offset, y, color);
         }
         else
         {
-            return putString(x + offset, y, str, color);
+            return putString(str, x + offset, y, color);
         }
     }
 
@@ -506,7 +506,7 @@ namespace zf
         return *this;
     }
 
-    TiledWindow& TiledWindow::putSprite(int x, int y, const sf::Sprite& sprite)
+    TiledWindow& TiledWindow::putSprite(const sf::Sprite& sprite, int x, int y)
     {
         if (moveCursor(x, y))
         {
@@ -515,18 +515,18 @@ namespace zf
         return *this;
     }
     
-    TiledWindow& TiledWindow::putSprite(const sf::IntRect& bound, const sf::Sprite& sprite)
+    TiledWindow& TiledWindow::putSprite(const sf::Sprite& sprite, const sf::IntRect& bound)
     {
-        return putSprite(bound.left, bound.top, bound.width, bound.height, sprite);
+        return putSprite(sprite, bound.left, bound.top, bound.width, bound.height);
     }
 
-    TiledWindow& TiledWindow::putSprite(int xStart, int yStart, int width, int height, const sf::Sprite& sprite)
+    TiledWindow& TiledWindow::putSprite(const sf::Sprite& sprite, int xStart, int yStart, int width, int height)
     {
         for (int x = xStart; x < xStart + width; x++)
         {
             for (int y = yStart; y < yStart + height; y++)
             {
-                putSprite(x, y, sprite);
+                putSprite(sprite, x, y);
             }
         }
         return *this;
@@ -541,7 +541,7 @@ namespace zf
         return *this;
     }
 
-    TiledWindow& TiledWindow::putChar(int x, int y, char c, const sf::Color& color)
+    TiledWindow& TiledWindow::putChar(char c, int x, int y, const sf::Color& color)
     {
         if (moveCursor(x, y))
         {
@@ -549,6 +549,29 @@ namespace zf
         }
         return *this;
     }
+
+    TiledWindow& TiledWindow::putSpecialChar(int c, const sf::Color& color)
+    {
+        auto tr = getSpecialChar(c);
+        if (tr.texture)
+        {
+            auto sprite = tr.createSprite();
+            sprite.setColor(color);
+            sprite.setScale(scaling, scaling);
+            putSprite(sprite);
+        }
+        return *this;
+    }
+    
+    TiledWindow& TiledWindow::putSpecialChar(int c, int x, int y, const sf::Color& color)
+    {
+        if (moveCursor(x, y))
+        {
+            return putSpecialChar(c, color);
+        }
+        return *this;
+    }
+
     //////////////////// border ////////////////////
     void TiledWindow::drawEdgeBorder(const sf::Color& color)
     {
@@ -567,27 +590,27 @@ namespace zf
         {
             return;
         }
-        putSprite(bound.left, bound.top, zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NORTH_BIT | TiledWindowFactory::WEST_BIT]).createSprite(), color));
-        sf::Sprite top = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NORTH_BIT]).createSprite(), color);
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NorthBit | TiledWindowFactory::WestBit]).createSprite(), color), bound.left, bound.top);
+        sf::Sprite top = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NorthBit]).createSprite(), color);
         for (int i = 0; i < bound.width - 2; i++)
         {
             putSprite(top);
         }
-        putSprite(rightOf(bound), topOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NORTH_BIT | TiledWindowFactory::EAST_BIT]).createSprite(), color));
-        sf::Sprite left = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::WEST_BIT]).createSprite(), color);
-        sf::Sprite right = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::EAST_BIT]).createSprite(), color);
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::NorthBit | TiledWindowFactory::EastBit]).createSprite(), color), rightOf(bound), topOf(bound));
+        sf::Sprite left = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::WestBit]).createSprite(), color);
+        sf::Sprite right = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::EastBit]).createSprite(), color);
         for (int y = 1; y < bound.height - 1; y++)
         {
-            putSprite(leftOf(bound), bound.top + y, left);
-            putSprite(rightOf(bound), bound.top + y, right);
+            putSprite(left, leftOf(bound), bound.top + y);
+            putSprite(right, rightOf(bound), bound.top + y);
         }
-        putSprite(leftOf(bound), bottomOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SOUTH_BIT | TiledWindowFactory::WEST_BIT]).createSprite(), color));
-        sf::Sprite bottom = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SOUTH_BIT]).createSprite(), color);
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SouthBit | TiledWindowFactory::WestBit]).createSprite(), color), leftOf(bound), bottomOf(bound));
+        sf::Sprite bottom = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SouthBit]).createSprite(), color);
         for (int i = 0; i < bound.width - 2; i++)
         {
             putSprite(bottom);
         }
-        putSprite(rightOf(bound), bottomOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SOUTH_BIT | TiledWindowFactory::EAST_BIT]).createSprite(), color));
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Border[TiledWindowFactory::SouthBit | TiledWindowFactory::EastBit]).createSprite(), color), rightOf(bound), bottomOf(bound));
     }
 
     void TiledWindow::drawCenterBox(const sf::IntRect& bound, const sf::Color& color)
@@ -596,24 +619,24 @@ namespace zf
         {
             return;
         }
-        putSprite(leftOf(bound), topOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::SOUTH_BIT | TiledWindowFactory::EAST_BIT]).createSprite(), color));
-        sf::Sprite horizontal = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::EAST_BIT | TiledWindowFactory::WEST_BIT]).createSprite(), color);
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::SouthBit | TiledWindowFactory::EastBit]).createSprite(), color), leftOf(bound), topOf(bound));
+        sf::Sprite horizontal = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::EastBit | TiledWindowFactory::WestBit]).createSprite(), color);
         for (int i = 0; i < bound.width - 2; i++)
         {
             putSprite(horizontal);
         }
-        putSprite(rightOf(bound), topOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::SOUTH_BIT | TiledWindowFactory::WEST_BIT]).createSprite(), color));
-        sf::Sprite vertical = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NORTH_BIT|TiledWindowFactory::SOUTH_BIT]).createSprite(), color);
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::SouthBit | TiledWindowFactory::WestBit]).createSprite(), color), rightOf(bound), topOf(bound));
+        sf::Sprite vertical = zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NorthBit|TiledWindowFactory::SouthBit]).createSprite(), color);
         for (int y = 1; y < bound.height - 1; y++)
         {
-            putSprite(leftOf(bound), bound.top + y, vertical);
-            putSprite(rightOf(bound), bound.top + y, vertical);
+            putSprite(vertical, leftOf(bound), bound.top + y);
+            putSprite(vertical, rightOf(bound), bound.top + y);
         }
-        putSprite(leftOf(bound), bottomOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NORTH_BIT | TiledWindowFactory::EAST_BIT]).createSprite(), color));
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NorthBit | TiledWindowFactory::EastBit]).createSprite(), color), leftOf(bound), bottomOf(bound));
         for (int i = 0; i < bound.width - 2; i++)
         {
             putSprite(horizontal);
         }
-        putSprite(rightOf(bound), bottomOf(bound), zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NORTH_BIT | TiledWindowFactory::WEST_BIT]).createSprite(), color));
+        putSprite(zf::setCopyColor(getSpecialChar(TiledWindowFactory::Cross[TiledWindowFactory::NorthBit | TiledWindowFactory::WestBit]).createSprite(), color), rightOf(bound), bottomOf(bound));
     }
 }

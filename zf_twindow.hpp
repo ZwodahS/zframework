@@ -65,12 +65,13 @@ namespace zf
      */ 
     class TiledWindowFactory
     {
+    public:
         //////////////////// int values for special characters ////////////////////
-        static const int NORTH_BIT, EAST_BIT, SOUTH_BIT, WEST_BIT;
+        static const int NorthBit, EastBit, SouthBit, WestBit;
         static const int Up, Right, Down, Left;
         static const int Border[16];
         static const int Cross[16];
-        static const int Center_dot;
+        static const int CenterDot;
         static const int Diagonal[2];
         static const int Alternate[2];
         static const int Arrow[4];
@@ -314,16 +315,18 @@ namespace zf
         TiledWindow& draw(sf::RenderWindow& window);
         //////////////////// String drawing
         TiledWindow& putString(const std::string& str, const sf::Color& color = sf::Color::White);
-        TiledWindow& putString(int x, int y, const std::string& str, const sf::Color& color = sf::Color::White);
-        TiledWindow& putString(int x, int y, int width, const std::string& str, AlignmentX alignment = AlignmentX::Left, int offset = 0, const sf::Color& color = sf::Color::White);
+        TiledWindow& putString(const std::string& str, int x, int y, const sf::Color& color = sf::Color::White);
+        TiledWindow& putString(const std::string& str, int x, int y, int width, AlignmentX alignment = AlignmentX::Left, int offset = 0, const sf::Color& color = sf::Color::White);
         //////////////////// Sprite drawing
         TiledWindow& putSprite(const sf::Sprite& sprite);
-        TiledWindow& putSprite(int x, int y, const sf::Sprite& sprite);
-        TiledWindow& putSprite(const sf::IntRect& bound, const sf::Sprite& sprite);
-        TiledWindow& putSprite(int x, int y, int width, int height, const sf::Sprite& sprite);
+        TiledWindow& putSprite(const sf::Sprite& sprite, int x, int y);
+        TiledWindow& putSprite(const sf::Sprite& sprite, const sf::IntRect& bound);
+        TiledWindow& putSprite(const sf::Sprite& sprite, int x, int y, int width, int height);
         //////////////////// Single char drawing
         TiledWindow& putChar(char c, const sf::Color& color = sf::Color::White);
-        TiledWindow& putChar(int x, int y, char c, const sf::Color& color = sf::Color::White);
+        TiledWindow& putChar(char c, int x, int y, const sf::Color& color = sf::Color::White);
+        TiledWindow& putSpecialChar(int c, const sf::Color& color = sf::Color::White);
+        TiledWindow& putSpecialChar(int c, int x, int y, const sf::Color& color = sf::Color::White);
         //////////////////// Border drawing
         void drawEdgeBorder(const sf::Color& color = sf::Color::White);
         void drawCenterBorder(const sf::Color& color = sf::Color::White);
